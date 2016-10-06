@@ -13,7 +13,7 @@ env.Append( CPPPATH = [
     "../TSingleton",
     "../AMDTMutex",
     "../../Lib/Ext/utf8cpp/source",
-    "../../../CodeXL/Components/GpuProfiling/Backend",
+    env['CXL_gpu_profiler_backend_dir'],
     env['CXL_commonproj_dir'],
 ])
 
@@ -22,12 +22,12 @@ env.Append(CPPFLAGS = '-std=c++11 -fno-strict-aliasing -D_LINUX -DGDT_BUILD_SUFF
 
 sources = \
 [
-    "../../../CodeXL/Components/GpuProfiling/Backend/Common/Logger.cpp",
-    "../../../CodeXL/Components/GpuProfiling/Backend/Common/StringUtils.cpp",
-    "../../../CodeXL/Components/GpuProfiling/Backend/Common/OSUtils.cpp",
-    "../../../CodeXL/Components/GpuProfiling/Backend/Common/FileUtils.cpp",
-    "../../../CodeXL/Components/GpuProfiling/Backend/Common/BinFileHeader.cpp",
-    "../../../CodeXL/Components/GpuProfiling/Backend/Common/LocaleSetting.cpp",
+    env['CXL_gpu_profiler_backend_dir'] + "/Common/Logger.cpp",
+    env['CXL_gpu_profiler_backend_dir'] + "/Common/StringUtils.cpp",
+    env['CXL_gpu_profiler_backend_dir'] + "/Common/OSUtils.cpp",
+    env['CXL_gpu_profiler_backend_dir'] + "/Common/FileUtils.cpp",
+    env['CXL_gpu_profiler_backend_dir'] + "/Common/BinFileHeader.cpp",
+    env['CXL_gpu_profiler_backend_dir'] + "/Common/LocaleSetting.cpp",
     "../../../Common/Src/AMDTMutex/AMDTMutex.cpp",
     "AMDTActivityLogger.cpp",
     "AMDTActivityLoggerProfileControl.cpp",
