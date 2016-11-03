@@ -2,6 +2,7 @@ EXPORTS
    amdtInitializeActivityLogger
    amdtBeginMarker
    amdtEndMarker
+   amdtEndMarkerEx
    amdtFinalizeActivityLogger
    amdtStopProfiling
    amdtResumeProfiling

@@ -199,6 +199,8 @@ int AL_API_CALL amdtInitializeActivityLogger()
     return AL_SUCCESS;
 }
 
+const size_t s_DEFAULT_MARKER_NAME_WIDTH = 50;
+
 extern "C"
 int AL_API_CALL amdtBeginMarker(const char* szMarkerName, const char* szGroupName, const char* szUserString)
 {
@@ -252,18 +254,11 @@ int AL_API_CALL amdtBeginMarker(const char* szMarkerName, const char* szGroupNam
     strMarkerName = StringUtils::Replace(strMarkerName, " ", string(SPACE));
     strGroupName = StringUtils::Replace(strGroupName, " ", string(SPACE));
 
-    const size_t DEFAULT_MARKER_NAME_WIDTH = 50;
-
-    bool fit = true;
-
-    if (strMarkerName.length() >= DEFAULT_MARKER_NAME_WIDTH)
-    {
-        fit = false;
-    }
+    bool fit = strMarkerName.length() < s_DEFAULT_MARKER_NAME_WIDTH;
 
     if (fit)
     {
-        (*pItem->os) << left << setw(20) << "clBeginPerfMarker" << left << setw(DEFAULT_MARKER_NAME_WIDTH) << strMarkerName << setw(20) << OSUtils::Instance()->GetTimeNanos() << "   " << strGroupName << endl;
+        (*pItem->os) << left << setw(20) << "clBeginPerfMarker" << left << setw(s_DEFAULT_MARKER_NAME_WIDTH) << strMarkerName << setw(20) << OSUtils::Instance()->GetTimeNanos() << "   " << strGroupName << endl;
     }
     else
     {
@@ -279,6 +274,15 @@ int AL_API_CALL amdtBeginMarker(const char* szMarkerName, const char* szGroupNam
 extern "C"
 int AL_API_CALL amdtEndMarker()
 {
+    return amdtEndMarkerEx("", "", "");
+}
+
+extern "C"
+int AL_API_CALL amdtEndMarkerEx(const char* szMarkerName, const char* szGroupName, const char* szUserString)
+{
+    // TODO: szUserString is currently unused. Need to use it.
+    (void)(szUserString);
+
     AMDTScopeLock lock(&g_mtx);
 
     if (!g_bInit)
@@ -290,6 +294,25 @@ int AL_API_CALL amdtEndMarker()
     {
         return AL_FINALIZED_ACTIVITY_LOGGER;
     }
+
+    if (szMarkerName == NULL)
+    {
+        return AL_NULL_MARKER_NAME;
+    }
+
+    string strGroupName(DEFAULT_GROUP);
+
+    if (szGroupName != NULL)
+    {
+        strGroupName = szGroupName;
+
+        if (strGroupName.empty())
+        {
+            strGroupName = DEFAULT_GROUP;
+        }
+    }
+
+    string strMarkerName(szMarkerName);
 
     PerfMarkerItem* pItem;
     int ret = GetPerfMarkerItem(&pItem);
@@ -305,7 +328,31 @@ int AL_API_CALL amdtEndMarker()
         return AL_UNBALANCED_MARKER;
     }
 
-    (*pItem->os) << left << setw(20) << "clEndPerfMarker" << left << setw(20) << OSUtils::Instance()->GetTimeNanos() << endl;
+    if (strMarkerName.empty() && strGroupName == "DEFAULT_GROUP")
+    {
+        (*pItem->os) << left << setw(20) << "clEndPerfMarker" << left << setw(20) << OSUtils::Instance()->GetTimeNanos() << endl;
+    }
+    else
+    {
+        /// the marker name must not be an empty string
+        if (strMarkerName.empty())
+        {
+            return AL_NULL_MARKER_NAME;
+        }
+
+        bool fit = strMarkerName.length() < s_DEFAULT_MARKER_NAME_WIDTH;
+
+        if (fit)
+        {
+            (*pItem->os) << left << setw(20) << "clEndPerfMarkerEx" << setw(20) << OSUtils::Instance()->GetTimeNanos() << left << setw(s_DEFAULT_MARKER_NAME_WIDTH) << strMarkerName << "   " << strGroupName << endl;
+        }
+        else
+        {
+            // super long marker name
+            (*pItem->os) << "clEndPerfMarkerEx   " << setw(20) << OSUtils::Instance()->GetTimeNanos() << "   " << strMarkerName << "   " << strGroupName << endl;
+        }
+    }
+
     pItem->depth--;
 
     return AL_SUCCESS;
