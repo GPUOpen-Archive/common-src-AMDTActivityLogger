@@ -328,7 +328,7 @@ int AL_API_CALL amdtEndMarkerEx(const char* szMarkerName, const char* szGroupNam
         return AL_UNBALANCED_MARKER;
     }
 
-    if (strMarkerName.empty() && strGroupName == "DEFAULT_GROUP")
+    if (strMarkerName.empty() && strGroupName == DEFAULT_GROUP)
     {
         (*pItem->os) << left << setw(20) << "clEndPerfMarker" << left << setw(20) << OSUtils::Instance()->GetTimeNanos() << endl;
     }
