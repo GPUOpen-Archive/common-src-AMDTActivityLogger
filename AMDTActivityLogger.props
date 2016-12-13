@@ -8,7 +8,7 @@
     <AMDTActivityLoggerOutputDir>$(AMDTOutputDir)\$(Configuration)\bin\AMDTActivityLogger\</AMDTActivityLoggerOutputDir>
   </PropertyGroup>
   <PropertyGroup>
-    <OutDir>$(AMDTOutputDir)$(Configuration)\bin\$(ProjectName)\bin\$(GDTPlatform)</OutDir>
+    <OutDir>$(AMDTOutputDir)$(Configuration)\bin\$(ProjectName)\bin\$(AMDTPlatform)</OutDir>
     <IntDir>$(AMDTOutputDir)$(Configuration)\obj\$(ProjectName)\$(Platform)$(AMDTBuildSuffix)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup>
@@ -17,7 +17,7 @@
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>AMDTActivityLogger.def</ModuleDefinitionFile>
-      <ImportLibrary>$(AMDTOutputDir)$(Configuration)\bin\$(ProjectName)\lib\$(GDTPlatform)\$(TargetName).lib</ImportLibrary>
+      <ImportLibrary>$(AMDTOutputDir)$(Configuration)\bin\$(ProjectName)\lib\$(AMDTPlatform)\$(TargetName).lib</ImportLibrary>
       <AdditionalLibraryDirectories>$(AMDTOutputDir)$(Configuration)\arch;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>

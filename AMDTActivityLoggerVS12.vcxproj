@@ -39,23 +39,23 @@
     <Import Project="AMDTActivityLogger.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\bin\$(GDTPlatform)\</OutDir>
+    <OutDir>$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\bin\$(AMDTPlatform)\</OutDir>
     <ExtensionsToDeleteOnClean>$(ExtensionsToDeleteOnClean);$(CodeAnalysisLogFile);$(CodeAnalysisSucceededFile)</ExtensionsToDeleteOnClean>
     <TargetName>CXLActivityLogger$(AMDTPlatformSuffix)$(AMDTDebugSuffix)</TargetName>
     <IntDir>$(AMDTOutputDir)$(Configuration)\obj\AMDTActivityLogger\$(Platform)$(AMDTBuildSuffix)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\bin\$(GDTPlatform)\</OutDir>
+    <OutDir>$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\bin\$(AMDTPlatform)\</OutDir>
     <TargetName>CXLActivityLogger$(AMDTPlatformSuffix)$(AMDTDebugSuffix)</TargetName>
     <IntDir>$(AMDTOutputDir)$(Configuration)\obj\AMDTActivityLogger\$(Platform)$(AMDTBuildSuffix)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\bin\$(GDTPlatform)\</OutDir>
+    <OutDir>$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\bin\$(AMDTPlatform)\</OutDir>
     <TargetName>CXLActivityLogger$(AMDTPlatformSuffix)$(AMDTDebugSuffix)</TargetName>
     <IntDir>$(AMDTOutputDir)$(Configuration)\obj\AMDTActivityLogger\$(Platform)$(AMDTBuildSuffix)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\bin\$(GDTPlatform)\</OutDir>
+    <OutDir>$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\bin\$(AMDTPlatform)\</OutDir>
     <TargetName>CXLActivityLogger$(AMDTPlatformSuffix)$(AMDTDebugSuffix)</TargetName>
     <IntDir>$(AMDTOutputDir)$(Configuration)\obj\AMDTActivityLogger\$(Platform)$(AMDTBuildSuffix)\</IntDir>
   </PropertyGroup>
@@ -64,22 +64,22 @@
       <AdditionalIncludeDirectories>$(SolutionDir)\..\..\CodeXL\Components\PowerProfiling\Backend\AMDTPowerProfilingDrivers\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <ImportLibrary Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\lib\$(GDTPlatform)\$(TargetName).lib</ImportLibrary>
+      <ImportLibrary Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\lib\$(AMDTPlatform)\$(TargetName).lib</ImportLibrary>
     </Link>
     <Link>
-      <ImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\lib\$(GDTPlatform)\$(TargetName).lib</ImportLibrary>
+      <ImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\lib\$(AMDTPlatform)\$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Link>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary>$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\lib\$(GDTPlatform)\$(TargetName).lib</ImportLibrary>
+      <ImportLibrary>$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\lib\$(AMDTPlatform)\$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Link>
       <AdditionalDependencies>Advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary>$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\lib\$(GDTPlatform)\$(TargetName).lib</ImportLibrary>
+      <ImportLibrary>$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\lib\$(AMDTPlatform)\$(TargetName).lib</ImportLibrary>
     </Link>
     <ClCompile>
       <TreatSpecificWarningsAsErrors>4100;4101;4018;4062;4189;4700;%(TreatSpecificWarningsAsErrors)</TreatSpecificWarningsAsErrors>
