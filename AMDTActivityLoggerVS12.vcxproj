@@ -41,23 +41,23 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\bin\$(GDTPlatform)\</OutDir>
     <ExtensionsToDeleteOnClean>$(ExtensionsToDeleteOnClean);$(CodeAnalysisLogFile);$(CodeAnalysisSucceededFile)</ExtensionsToDeleteOnClean>
-    <TargetName>CXLActivityLogger$(GDTPlatformSuffix)$(GDTDebugSuffix)</TargetName>
-    <IntDir>$(AMDTOutputDir)$(Configuration)\obj\AMDTActivityLogger\$(Platform)$(GDTBuildSuffix)\</IntDir>
+    <TargetName>CXLActivityLogger$(AMDTPlatformSuffix)$(AMDTDebugSuffix)</TargetName>
+    <IntDir>$(AMDTOutputDir)$(Configuration)\obj\AMDTActivityLogger\$(Platform)$(AMDTBuildSuffix)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\bin\$(GDTPlatform)\</OutDir>
-    <TargetName>CXLActivityLogger$(GDTPlatformSuffix)$(GDTDebugSuffix)</TargetName>
-    <IntDir>$(AMDTOutputDir)$(Configuration)\obj\AMDTActivityLogger\$(Platform)$(GDTBuildSuffix)\</IntDir>
+    <TargetName>CXLActivityLogger$(AMDTPlatformSuffix)$(AMDTDebugSuffix)</TargetName>
+    <IntDir>$(AMDTOutputDir)$(Configuration)\obj\AMDTActivityLogger\$(Platform)$(AMDTBuildSuffix)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\bin\$(GDTPlatform)\</OutDir>
-    <TargetName>CXLActivityLogger$(GDTPlatformSuffix)$(GDTDebugSuffix)</TargetName>
-    <IntDir>$(AMDTOutputDir)$(Configuration)\obj\AMDTActivityLogger\$(Platform)$(GDTBuildSuffix)\</IntDir>
+    <TargetName>CXLActivityLogger$(AMDTPlatformSuffix)$(AMDTDebugSuffix)</TargetName>
+    <IntDir>$(AMDTOutputDir)$(Configuration)\obj\AMDTActivityLogger\$(Platform)$(AMDTBuildSuffix)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\bin\$(GDTPlatform)\</OutDir>
-    <TargetName>CXLActivityLogger$(GDTPlatformSuffix)$(GDTDebugSuffix)</TargetName>
-    <IntDir>$(AMDTOutputDir)$(Configuration)\obj\AMDTActivityLogger\$(Platform)$(GDTBuildSuffix)\</IntDir>
+    <TargetName>CXLActivityLogger$(AMDTPlatformSuffix)$(AMDTDebugSuffix)</TargetName>
+    <IntDir>$(AMDTOutputDir)$(Configuration)\obj\AMDTActivityLogger\$(Platform)$(AMDTBuildSuffix)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>

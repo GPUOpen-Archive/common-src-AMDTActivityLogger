@@ -18,7 +18,7 @@ env.Append( CPPPATH = [
 ])
 
 # osMessageBox, osDesktop
-env.Append(CPPFLAGS = '-std=c++11 -fno-strict-aliasing -D_LINUX -DGDT_BUILD_SUFFIX=')
+env.Append(CPPFLAGS = '-std=c++11 -fno-strict-aliasing -D_LINUX -DAMDT_BUILD_SUFFIX=')
 
 sources = \
 [

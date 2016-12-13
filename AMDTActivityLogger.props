@@ -9,7 +9,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <OutDir>$(AMDTOutputDir)$(Configuration)\bin\$(ProjectName)\bin\$(GDTPlatform)</OutDir>
-    <IntDir>$(AMDTOutputDir)$(Configuration)\obj\$(ProjectName)\$(Platform)$(GDTBuildSuffix)\</IntDir>
+    <IntDir>$(AMDTOutputDir)$(Configuration)\obj\$(ProjectName)\$(Platform)$(AMDTBuildSuffix)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
