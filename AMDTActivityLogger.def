@@ -8,5 +8,3 @@ EXPORTS
    amdtResumeProfiling
    amdtStopProfilingEx
    amdtResumeProfilingEx
-   amdtPowerBeginMarker
-   amdtPowerEndMarker

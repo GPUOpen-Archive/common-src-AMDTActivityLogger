@@ -113,7 +113,6 @@
     <ClCompile Include="AMDTActivityLogger.cpp" />
     <ClCompile Include="AMDTActivityLoggerProfileControl.cpp" />
     <ClCompile Include="AMDTCpuProfileControl_Win.cpp" />
-    <ClCompile Include="AMDTPowerProfileActivityLogger_Win.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

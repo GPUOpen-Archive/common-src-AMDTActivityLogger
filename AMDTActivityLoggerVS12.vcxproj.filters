@@ -13,9 +13,6 @@
     <ClCompile Include="AMDTCpuProfileControl_Win.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AMDTPowerProfileActivityLogger_Win.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\FileUtils.cpp" />
     <ClCompile Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\LocaleSetting.cpp" />
     <ClCompile Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\Logger.cpp" />
