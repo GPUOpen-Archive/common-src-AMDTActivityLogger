@@ -1,7 +1,7 @@
 //==============================================================================
 // Copyright (c) 2015 Advanced Micro Devices, Inc. All rights reserved.
 /// \author AMD Developer Tools Team
-/// \file AMDTActivityLoggerProfileControl.cpp
+/// \file
 /// \brief  Implementation of the AMDTActivityLogger Profile Control singleton
 //==============================================================================
 
@@ -10,7 +10,7 @@
 
 #include "TSingleton.h"
 
-#include "Common/OSUtils.h"
+#include <AMDTOSWrappers/Include/osModule.h>
 
 #include "CXLActivityLogger.h"
 
@@ -36,13 +36,19 @@ public:
     int ResumeProfiling(amdtProfilingControlMode profilingControlMode);
 
 private:
+    /// Helper function to get the handle for the specified profiler library
+    /// \param pBaseName the base name of the profiler lib whose handle is needed
+    /// \param[out] libHandle the handle of the library, if it is already loaded in the current process
+    /// \return true if the profiler lib was loaded in the current process
+    bool GetHandleForProfilerLib(const wchar_t* pBaseName, osModuleHandle& libHandle);
+
     /// Helper function to initialize lib handles and function pointers, and to call the specified function pointer
     /// \param[in,out] libHandle the handle of the library to initialize the entry point from
     /// \param[in] pLibName the name of the library to initialize the entry point from
     /// \param[in,out] profilingControlProc the function pointer for the entry point
     /// \param[in] pProcName the name of the entry point
     /// \return true on success, false otherwise
-    bool CallProfileControlEntryPointFromLibrary(LIB_HANDLE& libHandle, const char* pLibName, ProfilingControlProc& profilingControlProc, const char* pProcName);
+    bool CallProfileControlEntryPointFromLibrary(osModuleHandle& libHandle, const wchar_t* pLibName, ProfilingControlProc& profilingControlProc, const char* pProcName);
 
     /// Helper function to initialize lib handles and function pointers, and to call the specified function pointer -- this method passes the mode param to the agent
     /// \param[in,out] libHandle the handle of the library to initialize the entry point from
@@ -51,26 +57,26 @@ private:
     /// \param[in] pProcName the name of the entry point
     /// \param[in] mode the profiling mode being stopped or resumed
     /// \return true on success, false otherwise
-    bool CallProfileControlEntryPointFromLibraryWithMode(LIB_HANDLE& libHandle, const char* pLibName, ProfilingControlProcWithMode& profilingControlProc, const char* pProcName, amdtProfilingControlMode mode);
+    bool CallProfileControlEntryPointFromLibraryWithMode(osModuleHandle& libHandle, const wchar_t* pLibName, ProfilingControlProcWithMode& profilingControlProc, const char* pProcName, amdtProfilingControlMode mode);
 
-    LIB_HANDLE           m_clTraceAgentHandle = NULL;                 ///< handle to the CL Tracing Agent module
-    LIB_HANDLE           m_hsaTraceAgentHandle = NULL;                ///< handle to the HSA Tracing Agent module
-    LIB_HANDLE           m_clProfilingAgentHandle = NULL;             ///< handle to the CL Profiling Agent module
-    LIB_HANDLE           m_hsaProfilingAgentHandle = NULL;            ///< handle to the HSA Profiling Agent module
-    LIB_HANDLE           m_clOccupancyAgentHandle = NULL;             ///< handle to the CL Occupancy Agent module
+    osModuleHandle           m_clTraceAgentHandle = nullptr;                  ///< handle to the CL Tracing Agent module
+    osModuleHandle           m_hsaTraceAgentHandle = nullptr;                 ///< handle to the HSA Tracing Agent module
+    osModuleHandle           m_clProfilingAgentHandle = nullptr;              ///< handle to the CL Profiling Agent module
+    osModuleHandle           m_hsaProfilingAgentHandle = nullptr;             ///< handle to the HSA Profiling Agent module
+    osModuleHandle           m_clOccupancyAgentHandle = nullptr;              ///< handle to the CL Occupancy Agent module
 
-    ProfilingControlProc m_pCLTraceStopProfilingProc = NULL;          ///< Pointer to the CL StopTracing entry point
-    ProfilingControlProc m_pCLTraceResumeProfilingProc = NULL;        ///< Pointer to the CL ResumeTracing entry point
-    ProfilingControlProc m_pCLPerfCounterStopProfilingProc = NULL;    ///< Pointer to the CL StopProfiling entry point
-    ProfilingControlProc m_pCLPerfCounterResumeProfilingProc = NULL;  ///< Pointer to the CL ResumeProfiling entry point
+    ProfilingControlProc m_pCLTraceStopProfilingProc = nullptr;               ///< Pointer to the CL StopTracing entry point
+    ProfilingControlProc m_pCLTraceResumeProfilingProc = nullptr;             ///< Pointer to the CL ResumeTracing entry point
+    ProfilingControlProc m_pCLPerfCounterStopProfilingProc = nullptr;         ///< Pointer to the CL StopProfiling entry point
+    ProfilingControlProc m_pCLPerfCounterResumeProfilingProc = nullptr;       ///< Pointer to the CL ResumeProfiling entry point
 
-    ProfilingControlProc m_pHSATraceStopProfilingProc = NULL;         ///< Pointer to the HSA StopTracing entry point
-    ProfilingControlProc m_pHSATraceResumeProfilingProc = NULL;       ///< Pointer to the HSA ResumeTracing entry point
-    ProfilingControlProc m_pHSAPerfCounterStopProfilingProc = NULL;   ///< Pointer to the HSA StopProfiling entry point
-    ProfilingControlProc m_pHSAPerfCounterResumeProfilingProc = NULL; ///< Pointer to the HSA ResumeProfiling entry point
+    ProfilingControlProc m_pHSATraceStopProfilingProc = nullptr;              ///< Pointer to the HSA StopTracing entry point
+    ProfilingControlProc m_pHSATraceResumeProfilingProc = nullptr;            ///< Pointer to the HSA ResumeTracing entry point
+    ProfilingControlProc m_pHSAPerfCounterStopProfilingProc = nullptr;        ///< Pointer to the HSA StopProfiling entry point
+    ProfilingControlProc m_pHSAPerfCounterResumeProfilingProc = nullptr;      ///< Pointer to the HSA ResumeProfiling entry point
 
-    ProfilingControlProcWithMode m_pCLOccupancyStopProfilingProc = NULL;   ///< Pointer to the CL Occupancy StopProfiling entry point
-    ProfilingControlProcWithMode m_pCLOccupancyResumeProfilingProc = NULL; ///< Pointer to the CL Occupancy ResumeProfiling entry point
+    ProfilingControlProcWithMode m_pCLOccupancyStopProfilingProc = nullptr;   ///< Pointer to the CL Occupancy StopProfiling entry point
+    ProfilingControlProcWithMode m_pCLOccupancyResumeProfilingProc = nullptr; ///< Pointer to the CL Occupancy ResumeProfiling entry point
 };
 
 #endif // _AMDT_ACTIVITY_LOGGER_PROFILE_CONTROL_H_

@@ -35,27 +35,13 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\Local-CommonProjects.props" />
-    <Import Project="AMDTActivityLogger.props" />
+    <Import Condition="'$(SolutionName)'=='CodeXL-AllProjects'" Project="..\Local-CommonProjects.props" />
+    <Import Condition="'$(SolutionName)'=='CodeXL-AllProjects'" Project="AMDTActivityLogger.props" />
+    <Import Condition="'$(SolutionName)'!='CodeXL-AllProjects'" Project="$(SolutionDir)\..\..\..\RCP\Build\VS2015\RCP-Common.props" />
   </ImportGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <PropertyGroup>
     <OutDir>$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\bin\$(AMDTPlatform)\</OutDir>
     <ExtensionsToDeleteOnClean>$(ExtensionsToDeleteOnClean);$(CodeAnalysisLogFile);$(CodeAnalysisSucceededFile)</ExtensionsToDeleteOnClean>
-    <TargetName>CXLActivityLogger$(AMDTPlatformSuffix)$(AMDTDebugSuffix)</TargetName>
-    <IntDir>$(AMDTOutputDir)$(Configuration)\obj\AMDTActivityLogger\$(Platform)$(AMDTBuildSuffix)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\bin\$(AMDTPlatform)\</OutDir>
-    <TargetName>CXLActivityLogger$(AMDTPlatformSuffix)$(AMDTDebugSuffix)</TargetName>
-    <IntDir>$(AMDTOutputDir)$(Configuration)\obj\AMDTActivityLogger\$(Platform)$(AMDTBuildSuffix)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\bin\$(AMDTPlatform)\</OutDir>
-    <TargetName>CXLActivityLogger$(AMDTPlatformSuffix)$(AMDTDebugSuffix)</TargetName>
-    <IntDir>$(AMDTOutputDir)$(Configuration)\obj\AMDTActivityLogger\$(Platform)$(AMDTBuildSuffix)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\bin\$(AMDTPlatform)\</OutDir>
     <TargetName>CXLActivityLogger$(AMDTPlatformSuffix)$(AMDTDebugSuffix)</TargetName>
     <IntDir>$(AMDTOutputDir)$(Configuration)\obj\AMDTActivityLogger\$(Platform)$(AMDTBuildSuffix)\</IntDir>
   </PropertyGroup>
@@ -64,62 +50,29 @@
       <AdditionalIncludeDirectories>$(SolutionDir)\..\..\CodeXL\Components\PowerProfiling\Backend\AMDTPowerProfilingDrivers\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <ImportLibrary Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\lib\$(AMDTPlatform)\$(TargetName).lib</ImportLibrary>
-    </Link>
-    <Link>
-      <ImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\lib\$(AMDTPlatform)\$(TargetName).lib</ImportLibrary>
-    </Link>
+      <ModuleDefinitionFile>AMDTActivityLogger.def</ModuleDefinitionFile>
+     <ImportLibrary>$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\lib\$(AMDTPlatform)\$(TargetName).lib</ImportLibrary>
+  </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary>$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\lib\$(AMDTPlatform)\$(TargetName).lib</ImportLibrary>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Link>
-      <AdditionalDependencies>Advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary>$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\lib\$(AMDTPlatform)\$(TargetName).lib</ImportLibrary>
-    </Link>
-    <ClCompile>
-      <TreatSpecificWarningsAsErrors>4100;4101;4018;4062;4189;4700;%(TreatSpecificWarningsAsErrors)</TreatSpecificWarningsAsErrors>
-      <SDLCheck>false</SDLCheck>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\FileUtils.cpp" />
-    <ClCompile Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\LocaleSetting.cpp" />
-    <ClCompile Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\Logger.cpp" />
-    <ClCompile Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\OSUtils.cpp" />
-    <ClCompile Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\StringUtils.cpp" />
-  </ItemGroup>
   <ItemGroup>
     <None Include="AMDTActivityLogger.def" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\\AMDTMutex\AMDTMutex.h" />
+    <ClInclude Include="..\AMDTMutex\AMDTMutex.h" />
+    <ClInclude Include="AMDTActivityLoggerTimeStamp.h" />
     <ClInclude Include="CXLActivityLogger.h" />
     <ClInclude Include="AMDTActivityLoggerProfileControl.h" />
     <ClInclude Include="AMDTCpuProfileControl.h" />
+    <ClInclude Include="AMDTGPUProfilerDefs.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\FileUtils.h" />
-    <ClInclude Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\LocaleSetting.h" />
-    <ClInclude Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\Logger.h" />
-    <ClInclude Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\OSUtils.h" />
-    <ClInclude Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\StringUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\AMDTMutex\AMDTMutex.cpp" />
     <ClCompile Include="AMDTActivityLogger.cpp" />
     <ClCompile Include="AMDTActivityLoggerProfileControl.cpp" />
+    <ClCompile Include="AMDTActivityLoggerTimeStamp.cpp" />
     <ClCompile Include="AMDTCpuProfileControl_Win.cpp" />
     <ClCompile Include="dllmain.cpp">
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsManaged>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

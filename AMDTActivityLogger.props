@@ -12,11 +12,7 @@
     <IntDir>$(AMDTOutputDir)$(Configuration)\obj\$(ProjectName)\$(Platform)$(AMDTBuildSuffix)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup>
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\CodeXL\Components\GpuProfiling\Backend\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ClCompile>
     <Link>
-      <ModuleDefinitionFile>AMDTActivityLogger.def</ModuleDefinitionFile>
       <ImportLibrary>$(AMDTOutputDir)$(Configuration)\bin\$(ProjectName)\lib\$(AMDTPlatform)\$(TargetName).lib</ImportLibrary>
       <AdditionalLibraryDirectories>$(AMDTOutputDir)$(Configuration)\arch;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>

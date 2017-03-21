@@ -9,8 +9,8 @@
 // Copyright (c) 2013 - 2015 Advanced Micro Devices, Inc.  All rights reserved.
 //=============================================================================
 
-#ifndef _AMDT_ACTIVITY_LOGGER_H_
-#define _AMDT_ACTIVITY_LOGGER_H_
+#ifndef _CXL_ACTIVITY_LOGGER_H_
+#define _CXL_ACTIVITY_LOGGER_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,8 +20,9 @@ extern "C" {
 #define AL_UNINITIALIZED_ACTIVITY_LOGGER      -1
 #define AL_FINALIZED_ACTIVITY_LOGGER          -2
 #define AL_UNBALANCED_MARKER                  -3
-#define AL_APP_PROFILER_NOT_DETECTED          -4
-#define AL_CODEXL_GPU_PROFILER_NOT_DETECTED   -4
+#define AL_APP_PROFILER_NOT_DETECTED          -4 // left here for backward compatibility
+#define AL_CODEXL_GPU_PROFILER_NOT_DETECTED   -4 // left here for backward compatibility
+#define AL_GPU_PROFILER_NOT_DETECTED          -4
 #define AL_NULL_MARKER_NAME                   -5
 #define AL_INTERNAL_ERROR                     -6
 #define AL_OUT_OF_MEMORY                      -7
@@ -29,6 +30,7 @@ extern "C" {
 #define AL_FAILED_TO_ATTACH_TO_PROFILER       -9
 #define AL_WARN_PROFILE_ALREADY_RESUMED       -10
 #define AL_WARN_PROFILE_ALREADY_PAUSED        -11
+#define AL_GPU_PROFILER_MISMATCH              -12
 
 #if defined(_WIN32) || defined(__CYGWIN__)
 #define AL_API_CALL __stdcall
@@ -145,7 +147,7 @@ public:
 
     amdtScopedMarker(const char* szMarkerName, const char* szGroupName)
     {
-        amdtBeginMarker(szMarkerName, szGroupName, NULL);
+        amdtBeginMarker(szMarkerName, szGroupName, nullptr);
     }
 
     ~amdtScopedMarker()
@@ -155,4 +157,4 @@ public:
 };
 #endif
 
-#endif // _AMDT_ACTIVITY_LOGGER_H_
+#endif // _CXL_ACTIVITY_LOGGER_H_

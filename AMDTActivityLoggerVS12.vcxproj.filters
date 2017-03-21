@@ -13,17 +13,14 @@
     <ClCompile Include="AMDTCpuProfileControl_Win.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\FileUtils.cpp" />
-    <ClCompile Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\LocaleSetting.cpp" />
-    <ClCompile Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\Logger.cpp" />
-    <ClCompile Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\OSUtils.cpp" />
-    <ClCompile Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\StringUtils.cpp" />
-    <ClCompile Include="..\AMDTMutex\AMDTMutex.cpp" />
+    <ClCompile Include="..\AMDTMutex\AMDTMutex.cpp">
+      <Filter>Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="AMDTActivityLoggerTimeStamp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Shared">
-      <UniqueIdentifier>{5b58505d-d8fa-4330-84fc-5c12e45477ff}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files">
       <UniqueIdentifier>{9f549909-7ee9-443c-a7b7-1faf4460df95}</UniqueIdentifier>
     </Filter>
@@ -32,6 +29,9 @@
     </Filter>
     <Filter Include="Source Files">
       <UniqueIdentifier>{c56e9fdb-01fa-4738-9958-5aa58a6e76d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shared">
+      <UniqueIdentifier>{fe99624f-d9f6-432b-bc3e-38e1fccadc00}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -44,13 +44,14 @@
     <ClInclude Include="AMDTCpuProfileControl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\\AMDTMutex\AMDTMutex.h" />
-    <ClInclude Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\FileUtils.h" />
-    <ClInclude Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\LocaleSetting.h" />
-    <ClInclude Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\Logger.h" />
-    <ClInclude Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\OSUtils.h" />
-    <ClInclude Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\StringUtils.h" />
     <ClInclude Include="CXLActivityLogger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\AMDTMutex\AMDTMutex.h" />
+    <ClInclude Include="AMDTGPUProfilerDefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AMDTActivityLoggerTimeStamp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

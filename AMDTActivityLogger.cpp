@@ -1,7 +1,7 @@
 //==============================================================================
 // Copyright (c) 2015 Advanced Micro Devices, Inc. All rights reserved.
 /// \author AMD Developer Tools Team
-/// \file AMDTActivityLogger.cpp
+/// \file
 /// \brief  Implementation of the AMDTActivityLogger lib
 //==============================================================================
 
@@ -13,64 +13,137 @@
 
 #include <AMDTOSWrappers/Include/osProcess.h>
 #include <AMDTOSWrappers/Include/osThread.h>
+#include <AMDTOSWrappers/Include/osFile.h>
 
 #include "CXLActivityLogger.h"
 #include "AMDTActivityLoggerProfileControl.h"
+#include "AMDTGPUProfilerDefs.h"
 #include "AMDTCpuProfileControl.h"
-#include "Common/OSUtils.h"
-#include "Common/FileUtils.h"
-#include "Common/StringUtils.h"
-#include "Common/Logger.h"
+#include "AMDTActivityLoggerTimeStamp.h"
 #include "AMDTMutex.h"
 
 using namespace std;
-using namespace GPULogger;
 
 #define INDENT "   "
 #define DEFAULT_GROUP "Default"
 
-Parameters g_params;
-AMDTMutex g_mtx;
-bool g_bInit = false;
-bool g_bFinalized = false;
-
+/// Class to track a perf marker
 class PerfMarkerItem
 {
 public:
+    /// Constructor
     PerfMarkerItem()
     {
-        os = NULL;
-        depth = 0;
+        m_pOstream = nullptr;
+        m_depth = 0;
     }
 
+    /// Destructor
     ~PerfMarkerItem()
     {
-        SAFE_DELETE(os);
+        delete m_pOstream;
+        m_pOstream = nullptr;
     }
 
-    ostream* os;
-    int depth;
+    ostream* m_pOstream; ///< output stream used to write the perf marker data
+    int m_depth;         ///< depth of this perf marker
 
 private:
+    /// Disabled copy contructor
     PerfMarkerItem(const PerfMarkerItem& obj);
+
+    /// Disabled assignment operator
     PerfMarkerItem& operator = (const PerfMarkerItem& obj);
 };
 
+AMDTMutex g_mtx;                                       ///< mutex to protect access to marker API
+bool g_bInit = false;                                  ///< global flag indicating if the library has been initialized
+bool g_bFinalized = false;                             ///< global flag indicating if the library has been finalized
+
+bool g_isTimeoutMode = false;                          ///< global flag indicating if timeout mode is being used
+string g_tempPerfMarkerFile;                           ///< name of the temp perf marker file
+string g_perfFileName;                                 ///< name of the perf marker file
+map<osThreadId, PerfMarkerItem*> g_perfMarkerItemMap;  ///< map from thread id to permarker items
+
+/// ofstream descendant which specifies a file name
 class ofstream_with_filename : public ofstream
 {
 public:
+    /// Constructor
     ofstream_with_filename(const char* file)
         : ofstream(file)
     {
-        fileName = file;
+        m_fileName = file;
     }
 
-    string fileName;
+    string m_fileName; ///< the filename
 };
 
-map<osThreadId, PerfMarkerItem*> g_perfMarkerItemMap;
-string g_strPerfFileName;
+/// Gets the name of the temp file used to pass params betwee the GPU profiler and the ActivityLogger
+/// \param[out] tempParamsFile the name of the params file
+void GetTempActivityLoggerParamsFile(osFilePath& tempParamsFile)
+{
+#ifdef _WIN32
+    tempParamsFile.setPath(osFilePath::OS_TEMP_DIRECTORY);
+    tempParamsFile.setFileName(L"rcpdata");
+    tempParamsFile.setFileExtension(AL_PERFMARKER_EXT);
+#else //_LINUX || LINUX
+    tempParamsFile.setPath(osFilePath::OS_USER_DOCUMENTS);
+    tempParamsFile.setFileName(L".rcpdata");
+    tempParamsFile.setFileExtension(AL_PERFMARKER_EXT);
+#endif
+}
 
+/// Reads the temp params file and sets the global vars
+/// \return true on success
+bool GetParametersFromFile()
+{
+    bool retVal = false;
+    osFilePath tempParamsFile;
+    GetTempActivityLoggerParamsFile(tempParamsFile);
+    osFile tempFile(tempParamsFile);
+    retVal = tempFile.open(osChannel::OS_ASCII_TEXT_CHANNEL);
+
+    if (retVal)
+    {
+        gtASCIIString line;
+        bool timeoutParamFound = false;
+        bool tempFileParamFound = false;
+        bool outputFileParamFound = false;
+
+        while (tempFile.readLine(line))
+        {
+            int equalPos = line.find("=");
+            gtASCIIString paramName = line.substr(0, equalPos);
+            gtASCIIString value = line.substr(equalPos + 1);
+
+            if (paramName == "TimeOut")
+            {
+                timeoutParamFound = true;
+                g_isTimeoutMode = value == "True";
+            }
+            else if (paramName == "PerfMarkerTempFileBaseName")
+            {
+                tempFileParamFound = true;
+                g_tempPerfMarkerFile = value.asCharArray();
+            }
+            else if (paramName == "PerfMarkerOutputFileName")
+            {
+                outputFileParamFound = true;
+                g_perfFileName = value.asCharArray();
+            }
+        }
+
+        tempFile.close();
+        retVal = timeoutParamFound && tempFileParamFound && outputFileParamFound;
+    }
+
+    return retVal;
+}
+
+/// Gets the current perf marker item
+/// \param[out] ppItem the current perf marker item
+/// \return the status code
 int GetPerfMarkerItem(PerfMarkerItem** ppItem)
 {
     if (ppItem == NULL)
@@ -78,7 +151,6 @@ int GetPerfMarkerItem(PerfMarkerItem** ppItem)
         return AL_INTERNAL_ERROR;
     }
 
-    stringstream ss;
     ostream* os = NULL;
     osThreadId tid = osGetUniqueCurrentThreadId();
     map<osThreadId, PerfMarkerItem*>::const_iterator it;
@@ -91,22 +163,15 @@ int GetPerfMarkerItem(PerfMarkerItem** ppItem)
     }
     else
     {
-        if (g_params.m_bTimeOutBasedOutput)
+        if (g_isTimeoutMode)
         {
+            stringstream ss;
             // Timeout mode, create a tmp file
             string path;
             osProcessId pid = osGetCurrentProcessId();
 
-            if (g_params.m_strOutputFile.empty())
-            {
-                path = FileUtils::GetDefaultOutputPath();
-            }
-            else
-            {
-                path = FileUtils::GetTempFragFilePath();
-            }
-
-            ss << path << pid << "_" << tid << PERFMARKER_EXT;
+            path = g_tempPerfMarkerFile;
+            ss << path << pid << "_" << tid << "." << AL_PERFMARKER_EXT;
             os = new(nothrow) ofstream_with_filename(ss.str().c_str());
         }
         else
@@ -127,8 +192,8 @@ int GetPerfMarkerItem(PerfMarkerItem** ppItem)
             return AL_OUT_OF_MEMORY;
         }
 
-        pItem->depth = 0;
-        pItem->os = os;
+        pItem->m_depth = 0;
+        pItem->m_pOstream = os;
         g_perfMarkerItemMap.insert(pair<osThreadId, PerfMarkerItem*>(tid, pItem));
 
         *ppItem = pItem;
@@ -151,55 +216,43 @@ int AL_API_CALL amdtInitializeActivityLogger()
         return AL_FINALIZED_ACTIVITY_LOGGER;
     }
 
-    // NOTE: the following code will only work with an internal build if you're
-    //       also using an internal version of the ActivityLogger library
-    bool isProfileAgentFound = false;
-    string agent = OSUtils::Instance()->GetEnvVar("CL_AGENT");
 
-    if (!agent.empty())
+    gtString envVarValue;
+    bool envVarFound = osGetCurrentProcessEnvVariableValue(AL_CL_AGENT, envVarValue);
+
+    bool isTraceAgentFound = false;
+
+    if (envVarFound && !envVarValue.isEmpty())
     {
-        isProfileAgentFound = agent.find(CL_TRACE_AGENT_DLL) != string::npos ||
-                              agent.find(CL_PROFILE_AGENT_DLL) != string::npos;
+        isTraceAgentFound = -1 != envVarValue.find(AL_CL_TRACE_AGENT_DLL);
     }
 
-    if (!isProfileAgentFound)
+    if (!isTraceAgentFound)
     {
-        agent = OSUtils::Instance()->GetEnvVar("HSA_TOOLS_LIB");
+        envVarFound = osGetCurrentProcessEnvVariableValue(AL_HSA_TOOLS_LIB, envVarValue);
 
-        if (!agent.empty())
+        if (envVarFound && !envVarValue.isEmpty())
         {
-            isProfileAgentFound = agent.find(HSA_TRACE_AGENT_DLL) != string::npos ||
-                                  agent.find(HSA_PROFILE_AGENT_DLL) != string::npos;
+            isTraceAgentFound = -1 != envVarValue.find(AL_HSA_TRACE_AGENT_DLL);
         }
     }
 
-    if (!isProfileAgentFound)
+    if (!isTraceAgentFound)
     {
-        return AL_CODEXL_GPU_PROFILER_NOT_DETECTED;
+        return AL_GPU_PROFILER_NOT_DETECTED;
     }
-
-    FileUtils::GetParametersFromFile(g_params);
 
     g_bInit = true;
 
-    if (g_params.m_strOutputFile.empty())
+    if (!GetParametersFromFile())
     {
-        g_strPerfFileName = FileUtils::GetDefaultPerfMarkerOutputFile();
+        return AL_GPU_PROFILER_MISMATCH;
     }
-    else
-    {
-        g_strPerfFileName = FileUtils::GetBaseFileName(g_params.m_strOutputFile) + PERFMARKER_EXT;
-    }
-
-#ifdef _DEBUG
-    cout << "AMDTActivityLogger initialized.\n";
-    cout << "AMDTActivityLogger output: " << g_strPerfFileName << endl;
-#endif
 
     return AL_SUCCESS;
 }
 
-const size_t s_DEFAULT_MARKER_NAME_WIDTH = 50;
+const size_t s_DEFAULT_MARKER_NAME_WIDTH = 50; ///< default marker name width
 
 extern "C"
 int AL_API_CALL amdtBeginMarker(const char* szMarkerName, const char* szGroupName, const char* szUserString)
@@ -224,7 +277,7 @@ int AL_API_CALL amdtBeginMarker(const char* szMarkerName, const char* szGroupNam
         return AL_NULL_MARKER_NAME;
     }
 
-    string strGroupName;
+    gtASCIIString strGroupName;
 
     if (szGroupName == NULL)
     {
@@ -235,38 +288,37 @@ int AL_API_CALL amdtBeginMarker(const char* szMarkerName, const char* szGroupNam
         strGroupName = szGroupName;
     }
 
-    if (strGroupName.empty())
+    if (strGroupName.isEmpty())
     {
         strGroupName = DEFAULT_GROUP;
     }
 
-    string strMarkerName(szMarkerName);
+    gtASCIIString strMarkerName(szMarkerName);
 
     PerfMarkerItem* pItem;
     int ret = GetPerfMarkerItem(&pItem);
-    SpAssert(ret == AL_SUCCESS);
 
     if (ret != AL_SUCCESS)
     {
         return ret;
     }
 
-    strMarkerName = StringUtils::Replace(strMarkerName, " ", string(SPACE));
-    strGroupName = StringUtils::Replace(strGroupName, " ", string(SPACE));
+    strMarkerName.replace(" ", AL_SPACE);
+    strGroupName.replace(" ", AL_SPACE);
 
-    bool fit = strMarkerName.length() < s_DEFAULT_MARKER_NAME_WIDTH;
+    bool fit = static_cast<size_t>(strMarkerName.length()) < s_DEFAULT_MARKER_NAME_WIDTH;
 
     if (fit)
     {
-        (*pItem->os) << left << setw(20) << "clBeginPerfMarker" << left << setw(s_DEFAULT_MARKER_NAME_WIDTH) << strMarkerName << setw(20) << OSUtils::Instance()->GetTimeNanos() << "   " << strGroupName << endl;
+        (*pItem->m_pOstream) << left << setw(20) << "clBeginPerfMarker" << left << setw(s_DEFAULT_MARKER_NAME_WIDTH) << strMarkerName.asCharArray() << setw(20) << AMDTActivityLoggerTimeStamp::Instance()->GetTimeNanos() << "   " << strGroupName.asCharArray() << endl;
     }
     else
     {
         // super long marker name
-        (*pItem->os) << "clBeginPerfMarker   " << strMarkerName << "   " << OSUtils::Instance()->GetTimeNanos() << "   " << strGroupName << endl;
+        (*pItem->m_pOstream) << "clBeginPerfMarker   " << strMarkerName.asCharArray() << "   " << AMDTActivityLoggerTimeStamp::Instance()->GetTimeNanos() << "   " << strGroupName.asCharArray() << endl;
     }
 
-    pItem->depth++;
+    pItem->m_depth++;
 
     return AL_SUCCESS;
 }
@@ -316,21 +368,20 @@ int AL_API_CALL amdtEndMarkerEx(const char* szMarkerName, const char* szGroupNam
 
     PerfMarkerItem* pItem;
     int ret = GetPerfMarkerItem(&pItem);
-    SpAssert(ret == AL_SUCCESS);
 
     if (ret != AL_SUCCESS)
     {
         return ret;
     }
 
-    if (pItem->depth <= 0)
+    if (pItem->m_depth <= 0)
     {
         return AL_UNBALANCED_MARKER;
     }
 
     if (strMarkerName.empty() && strGroupName == DEFAULT_GROUP)
     {
-        (*pItem->os) << left << setw(20) << "clEndPerfMarker" << left << setw(20) << OSUtils::Instance()->GetTimeNanos() << endl;
+        (*pItem->m_pOstream) << left << setw(20) << "clEndPerfMarker" << left << setw(20) << AMDTActivityLoggerTimeStamp::Instance()->GetTimeNanos() << endl;
     }
     else
     {
@@ -344,19 +395,38 @@ int AL_API_CALL amdtEndMarkerEx(const char* szMarkerName, const char* szGroupNam
 
         if (fit)
         {
-            (*pItem->os) << left << setw(20) << "clEndPerfMarkerEx" << setw(20) << OSUtils::Instance()->GetTimeNanos() << left << setw(s_DEFAULT_MARKER_NAME_WIDTH) << strMarkerName << "   " << strGroupName << endl;
+            (*pItem->m_pOstream) << left << setw(20) << "clEndPerfMarkerEx" << setw(20) << AMDTActivityLoggerTimeStamp::Instance()->GetTimeNanos() << left << setw(s_DEFAULT_MARKER_NAME_WIDTH) << strMarkerName << "   " << strGroupName << endl;
         }
         else
         {
             // super long marker name
-            (*pItem->os) << "clEndPerfMarkerEx   " << setw(20) << OSUtils::Instance()->GetTimeNanos() << "   " << strMarkerName << "   " << strGroupName << endl;
+            (*pItem->m_pOstream) << "clEndPerfMarkerEx   " << setw(20) << AMDTActivityLoggerTimeStamp::Instance()->GetTimeNanos() << "   " << strMarkerName << "   " << strGroupName << endl;
         }
     }
 
-    pItem->depth--;
+    pItem->m_depth--;
 
     return AL_SUCCESS;
 }
+
+/// Helper function to count the number of newlines in a string
+/// \param str the input string
+/// \return the number of newlines in the string
+int GetNumLines(const string& str)
+{
+    int ret = 0;
+
+    for (size_t i = 0; i < str.length(); i++)
+    {
+        if (str[i] == '\n')
+        {
+            ret++;
+        }
+    }
+
+    return ret;
+}
+
 
 extern "C"
 int AL_API_CALL amdtFinalizeActivityLogger()
@@ -370,18 +440,14 @@ int AL_API_CALL amdtFinalizeActivityLogger()
 
     if (g_bInit)
     {
+
         ofstream fout;
-        fout.open(g_strPerfFileName.c_str());
+        fout.open(g_perfFileName.c_str());
 
         if (!fout.fail())
         {
             // write header
-            fout << "=====CodeXL Perfmarker Output=====\n";
-
-            if (g_params.m_bCompatibilityMode)
-            {
-                fout << "ProfilerVersion=" << GPUPROFILER_BACKEND_MAJOR_VERSION << "." << GPUPROFILER_BACKEND_MINOR_VERSION << "." << GPUPROFILER_BACKEND_BUILD_NUMBER << endl;
-            }
+            fout << "=====Perfmarker Output=====\n";
 
             for (map<osThreadId, PerfMarkerItem*>::iterator it = g_perfMarkerItemMap.begin(); it != g_perfMarkerItemMap.end(); ++it)
             {
@@ -389,25 +455,34 @@ int AL_API_CALL amdtFinalizeActivityLogger()
                 // thread ID
                 fout << it->first << endl;
 
-                if (it->second->depth != 0)
+                if (it->second->m_depth != 0)
                 {
                     cout << "[Thread " << it->first << "] Unbalanced PerfMarker detected.\n";
                 }
 
-                if (g_params.m_bTimeOutBasedOutput)
+                if (g_isTimeoutMode)
                 {
-                    ofstream_with_filename* pOfstream = dynamic_cast<ofstream_with_filename*>(it->second->os);
+                    ofstream_with_filename* pOfstream = dynamic_cast<ofstream_with_filename*>(it->second->m_pOstream);
                     pOfstream->close();
-                    FileUtils::ReadFile(pOfstream->fileName, content);
-                    remove(pOfstream->fileName.c_str());
+                    gtString ofstreamFileName;
+                    ofstreamFileName.fromASCIIString(pOfstream->m_fileName.c_str());
+                    osFilePath markerFilePath;
+                    markerFilePath.setFullPathFromString(ofstreamFileName);
+                    osFile markerFile(markerFilePath);
+                    markerFile.open(osChannel::OS_ASCII_TEXT_CHANNEL);
+                    gtASCIIString fileContents;
+                    markerFile.readIntoString(fileContents);
+                    markerFile.close();
+                    content.assign(fileContents.asCharArray());
+                    remove(pOfstream->m_fileName.c_str());
                 }
                 else
                 {
-                    content = dynamic_cast<stringstream*>(it->second->os)->str();
+                    content = dynamic_cast<stringstream*>(it->second->m_pOstream)->str();
                 }
 
                 // num of markers
-                fout << StringUtils::GetNumLines(content) << endl;
+                fout << GetNumLines(content) << endl;
                 fout << content;
                 delete it->second;
             }
@@ -416,10 +491,6 @@ int AL_API_CALL amdtFinalizeActivityLogger()
             fout.close();
 
             g_bFinalized = true;
-
-#ifdef _DEBUG
-            cout << "AMDTActivityLogger finalized.\n";
-#endif
             return AL_SUCCESS;
         }
         else
