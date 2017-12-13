@@ -11,7 +11,6 @@ env.Append( CPPPATH = [
     ".",
     "../",
     "../TSingleton",
-    "../AMDTMutex",
     "../../Lib/Ext/utf8cpp/source",
     env['CXL_commonproj_dir'],
 ])
@@ -21,7 +20,6 @@ env.Append(CPPFLAGS = '-std=c++11 -fno-strict-aliasing -D_LINUX -DAMDT_BUILD_SUF
 
 sources = \
 [
-    "../../../Common/Src/AMDTMutex/AMDTMutex.cpp",
     "AMDTActivityLogger.cpp",
     "AMDTActivityLoggerProfileControl.cpp",
     "AMDTActivityLoggerTimeStamp.cpp",

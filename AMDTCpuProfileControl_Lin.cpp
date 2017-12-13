@@ -5,9 +5,9 @@
 #include <linux/limits.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <mutex>
 
 // Local header files
-#include <AMDTMutex.h>
 #include "CXLActivityLogger.h"
 #include "AMDTCpuProfileControl.h"
 
@@ -49,7 +49,7 @@ static CPU_PROF_SHARED _gCpuProfShared = { 0, nullptr };
 static bool _gIsCpuProfControllerInitialised = false;
 
 /// Mutex to lock Cpu Profiler shared data
-static AMDTMutex _gCpuProfMutex;
+static std::mutex _gCpuProfMutex;
 
 
 void initAMDTCpuProfileControl(void);
@@ -107,7 +107,7 @@ bool generateSharedObjName(pid_t pid, char* name)
 /// Resume CPU profiling
 int AMDTCpuProfileResume(void)
 {
-    AMDTScopeLock lock(_gCpuProfMutex);
+    std::lock_guard<std::mutex> lock(_gCpuProfMutex);
 
     if (!_gIsCpuProfControllerInitialised)
     {
@@ -142,7 +142,7 @@ int AMDTCpuProfileResume(void)
 /// Pause CPU profiling
 int AMDTCpuProfilePause(void)
 {
-    AMDTScopeLock lock(_gCpuProfMutex);
+    std::lock_guard<std::mutex> lock(_gCpuProfMutex);
 
     int rc = AL_SUCCESS;
 

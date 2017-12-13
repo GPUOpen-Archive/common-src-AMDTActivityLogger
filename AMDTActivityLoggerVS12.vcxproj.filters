@@ -13,9 +13,6 @@
     <ClCompile Include="AMDTCpuProfileControl_Win.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\AMDTMutex\AMDTMutex.cpp">
-      <Filter>Shared</Filter>
-    </ClCompile>
     <ClCompile Include="AMDTActivityLoggerTimeStamp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -29,9 +26,6 @@
     </Filter>
     <Filter Include="Source Files">
       <UniqueIdentifier>{c56e9fdb-01fa-4738-9958-5aa58a6e76d1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shared">
-      <UniqueIdentifier>{fe99624f-d9f6-432b-bc3e-38e1fccadc00}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -47,7 +41,6 @@
     <ClInclude Include="CXLActivityLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\AMDTMutex\AMDTMutex.h" />
     <ClInclude Include="AMDTGPUProfilerDefs.h">
       <Filter>Header Files</Filter>
     </ClInclude>

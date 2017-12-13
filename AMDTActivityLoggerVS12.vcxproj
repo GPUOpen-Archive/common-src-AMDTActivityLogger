@@ -51,14 +51,13 @@
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>AMDTActivityLogger.def</ModuleDefinitionFile>
-     <ImportLibrary>$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\lib\$(AMDTPlatform)\$(TargetName).lib</ImportLibrary>
-  </Link>
+      <ImportLibrary>$(AMDTOutputDir)$(Configuration)\bin\AMDTActivityLogger\lib\$(AMDTPlatform)\$(TargetName).lib</ImportLibrary>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="AMDTActivityLogger.def" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\AMDTMutex\AMDTMutex.h" />
     <ClInclude Include="AMDTActivityLoggerTimeStamp.h" />
     <ClInclude Include="CXLActivityLogger.h" />
     <ClInclude Include="AMDTActivityLoggerProfileControl.h" />
@@ -67,7 +66,6 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\AMDTMutex\AMDTMutex.cpp" />
     <ClCompile Include="AMDTActivityLogger.cpp" />
     <ClCompile Include="AMDTActivityLoggerProfileControl.cpp" />
     <ClCompile Include="AMDTActivityLoggerTimeStamp.cpp" />

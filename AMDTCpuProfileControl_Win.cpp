@@ -2,8 +2,8 @@
 #include <windows.h>
 #include <tlhelp32.h>
 #include <cstdint>
+#include <mutex>
 
-#include <AMDTMutex.h>
 #include "CXLActivityLogger.h"
 #include "AMDTCpuProfileControl.h"
 
@@ -62,7 +62,7 @@ static CPU_PROF_SHARED _gCpuProfShared = { nullptr, nullptr };
 static AMDTPidType _gCpuProfilerPid = AMDT_INVALID_PID;
 
 /// Mutex to lock Cpu Profiler shared data
-static AMDTMutex _gCpuProfMutex;
+static std::mutex _gCpuProfMutex;
 
 
 /// Fetch the current process id
@@ -241,7 +241,7 @@ int AMDTCpuProfileResume(void)
     int rc = AL_SUCCESS;
     AMDTClientIdType clientId = AMDT_INVALID_CLIENT;
 
-    AMDTScopeLock lock(_gCpuProfMutex);
+    std::lock_guard<std::mutex> lock(_gCpuProfMutex);
 
     if (!_gIsCpuProfControllerInitialised)
     {
@@ -287,7 +287,7 @@ int AMDTCpuProfilePause(void)
     int rc = AL_SUCCESS;
     AMDTClientIdType clientId = AMDT_INVALID_CLIENT;
 
-    AMDTScopeLock lock(_gCpuProfMutex);
+    std::lock_guard<std::mutex> lock(_gCpuProfMutex);
 
     if (!_gIsCpuProfControllerInitialised)
     {

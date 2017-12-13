@@ -10,6 +10,7 @@
 #include <iomanip>
 #include <map>
 #include <sstream>
+#include <mutex>
 
 #include <AMDTOSWrappers/Include/osProcess.h>
 #include <AMDTOSWrappers/Include/osThread.h>
@@ -20,7 +21,6 @@
 #include "AMDTGPUProfilerDefs.h"
 #include "AMDTCpuProfileControl.h"
 #include "AMDTActivityLoggerTimeStamp.h"
-#include "AMDTMutex.h"
 
 using namespace std;
 
@@ -56,7 +56,7 @@ private:
     PerfMarkerItem& operator = (const PerfMarkerItem& obj);
 };
 
-AMDTMutex g_mtx;                                       ///< mutex to protect access to marker API
+std::mutex g_mtx;                                      ///< mutex to protect access to marker API
 bool g_bInit = false;                                  ///< global flag indicating if the library has been initialized
 bool g_bFinalized = false;                             ///< global flag indicating if the library has been finalized
 
@@ -204,7 +204,7 @@ int GetPerfMarkerItem(PerfMarkerItem** ppItem)
 extern "C"
 int AL_API_CALL amdtInitializeActivityLogger()
 {
-    AMDTScopeLock lock(&g_mtx);
+    std::lock_guard<std::mutex> lock(g_mtx);
 
     if (g_bInit)
     {
@@ -260,7 +260,7 @@ int AL_API_CALL amdtBeginMarker(const char* szMarkerName, const char* szGroupNam
     // TODO: szUserString is currently unused. Need to use it.
     (void)(szUserString);
 
-    AMDTScopeLock lock(&g_mtx);
+    std::lock_guard<std::mutex> lock(g_mtx);
 
     if (!g_bInit)
     {
@@ -335,7 +335,7 @@ int AL_API_CALL amdtEndMarkerEx(const char* szMarkerName, const char* szGroupNam
     // TODO: szUserString is currently unused. Need to use it.
     (void)(szUserString);
 
-    AMDTScopeLock lock(&g_mtx);
+    std::lock_guard<std::mutex> lock(g_mtx);
 
     if (!g_bInit)
     {
@@ -431,7 +431,7 @@ int GetNumLines(const string& str)
 extern "C"
 int AL_API_CALL amdtFinalizeActivityLogger()
 {
-    AMDTScopeLock lock(&g_mtx);
+    std::lock_guard<std::mutex> lock(g_mtx);
 
     if (g_bFinalized)
     {
