@@ -115,7 +115,7 @@ extern int AL_API_CALL amdtStopProfiling(amdtProfilingControlMode profilingContr
 /// Instruct profiler to resume profiling. Profiling can be stopped using amdtStopProfiling.
 /// By default the CodeXL GPU Profiler starts profiling an application from the first API call (or
 /// first kernel dispatch in the case of performance counter profiling). To tell the profiler to
-/// disable profiling at the start of the application you can start CodeXLGpuProfiler with the --startdisabled flag.
+/// disable profiling at the start of the application you can start rcprof with the --startdisabled flag.
 /// \param profilingControlMode the profiling mode (or modes) to resume
 /// \return status code
 extern int AL_API_CALL amdtResumeProfiling(amdtProfilingControlMode profilingControlMode);

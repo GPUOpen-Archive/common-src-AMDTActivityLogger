@@ -19,7 +19,6 @@
 #include "CXLActivityLogger.h"
 #include "AMDTActivityLoggerProfileControl.h"
 #include "AMDTGPUProfilerDefs.h"
-#include "AMDTCpuProfileControl.h"
 #include "AMDTActivityLoggerTimeStamp.h"
 
 using namespace std;
@@ -171,7 +170,7 @@ int GetPerfMarkerItem(PerfMarkerItem** ppItem)
             osProcessId pid = osGetCurrentProcessId();
 
             path = g_tempPerfMarkerFile;
-            ss << path << pid << "_" << tid << "." << AL_PERFMARKER_EXT;
+            ss << path << pid << "_" << tid << "." << AL_PERFMARKER_EXT_NARROW;
             os = new(nothrow) ofstream_with_filename(ss.str().c_str());
         }
         else
@@ -509,14 +508,7 @@ int AL_API_CALL amdtStopProfiling(amdtProfilingControlMode profilingControlMode)
 {
     int result = AL_SUCCESS;
 
-    if (profilingControlMode & AMDT_CPU_PROFILING)
-    {
-        result = AMDTCpuProfilePause();
-    }
-    else
-    {
-        result = AMDTActivityLoggerProfileControl::Instance()->StopProfiling(profilingControlMode);
-    }
+    result = AMDTActivityLoggerProfileControl::Instance()->StopProfiling(profilingControlMode);
 
     return result;
 }
@@ -526,14 +518,7 @@ int AL_API_CALL amdtResumeProfiling(amdtProfilingControlMode profilingControlMod
 {
     int result = AL_SUCCESS;
 
-    if (profilingControlMode & AMDT_CPU_PROFILING)
-    {
-        result = AMDTCpuProfileResume();
-    }
-    else
-    {
-        result = AMDTActivityLoggerProfileControl::Instance()->ResumeProfiling(profilingControlMode);
-    }
+    result = AMDTActivityLoggerProfileControl::Instance()->ResumeProfiling(profilingControlMode);
 
     return result;
 }

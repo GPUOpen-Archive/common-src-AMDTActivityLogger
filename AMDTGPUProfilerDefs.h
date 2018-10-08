@@ -46,6 +46,7 @@
 #define AL_HSA_PROFILE_AGENT_DLL L"HSAProfileAgent"
 
 #define AL_PERFMARKER_EXT L"amdtperfmarker"
+#define AL_PERFMARKER_EXT_NARROW "amdtperfmarker"
 
 #define AL_SPACE "&nbsp;"
 

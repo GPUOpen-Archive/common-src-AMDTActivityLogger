@@ -10,9 +10,6 @@
     <ClCompile Include="AMDTActivityLoggerProfileControl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AMDTCpuProfileControl_Win.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AMDTActivityLoggerTimeStamp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -33,9 +30,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AMDTActivityLoggerProfileControl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AMDTCpuProfileControl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CXLActivityLogger.h">

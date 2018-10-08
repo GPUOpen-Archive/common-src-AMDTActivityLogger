@@ -23,7 +23,6 @@ sources = \
     "AMDTActivityLogger.cpp",
     "AMDTActivityLoggerProfileControl.cpp",
     "AMDTActivityLoggerTimeStamp.cpp",
-    "AMDTCpuProfileControl_Lin.cpp"
 ]
 
 # Creating object files

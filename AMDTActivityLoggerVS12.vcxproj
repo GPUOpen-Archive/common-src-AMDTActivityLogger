@@ -61,7 +61,6 @@
     <ClInclude Include="AMDTActivityLoggerTimeStamp.h" />
     <ClInclude Include="CXLActivityLogger.h" />
     <ClInclude Include="AMDTActivityLoggerProfileControl.h" />
-    <ClInclude Include="AMDTCpuProfileControl.h" />
     <ClInclude Include="AMDTGPUProfilerDefs.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
@@ -69,7 +68,6 @@
     <ClCompile Include="AMDTActivityLogger.cpp" />
     <ClCompile Include="AMDTActivityLoggerProfileControl.cpp" />
     <ClCompile Include="AMDTActivityLoggerTimeStamp.cpp" />
-    <ClCompile Include="AMDTCpuProfileControl_Win.cpp" />
     <ClCompile Include="dllmain.cpp">
     </ClCompile>
   </ItemGroup>
