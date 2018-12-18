@@ -35,7 +35,7 @@ extern "C" {
 #if defined(_WIN32) || defined(__CYGWIN__)
 #define AL_API_CALL __stdcall
 #else
-#define AL_API_CALL
+#define AL_API_CALL __attribute__((visibility("default")))
 #endif
 
 #ifdef __GNUC__
